@@ -1,0 +1,54 @@
+/* Header container */
+.header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 16px 40px;
+background-color: #0f172a; /* dark navy */
+}
+
+/* Logo / title */
+.header h2 {
+color: #ffffff;
+font-size: 24px;
+font-weight: 600;
+}
+
+/* Navigation container */
+.header nav {
+display: flex;
+align-items: center;
+gap: 24px;
+}
+
+/* Normal navigation links */
+.nav-link {
+color: #e5e7eb; /* light gray */
+text-decoration: none;
+font-size: 16px;
+font-weight: 500;
+transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover effect for links */
+.nav-link:hover {
+color: #38bdf8; /* light blue */
+transform: translateY(-1px);
+}
+
+/* Signup link styled as button */
+.header nav a:last-child {
+padding: 8px 16px;
+background-color: #38bdf8;
+color: #0f172a;
+border-radius: 6px;
+font-weight: 600;
+text-decoration: none;
+transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Signup hover */
+.header nav a:last-child:hover {
+background-color: #0ea5e9;
+transform: translateY(-1px);
+}
