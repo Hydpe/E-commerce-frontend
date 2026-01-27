@@ -3,11 +3,14 @@ import React from "react";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import "./Products.css";
 import { Products, Product } from "../../Data/Products";
+import  axios from "axios";
+
 
 const ProductsPage: React.FC = () => {
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart =async (product: Product) => {
     console.log("Added to cart:", product);
+
 
   };
   return (

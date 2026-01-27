@@ -2,7 +2,7 @@
 import React from "react";
 import "./ProductCard.css";
 import { useNavigate } from "react-router-dom";
-import { Products, Product } from "../../Data/Products";
+import{ Products, Product } from "../../Data/Products";
 
 
 interface ProductCardProps {
@@ -20,12 +20,14 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
       <h3 >{product.name}</h3 >
 
       <p className="price"> ₹{product.price}</p>
-
-      <button onClick={() => onAddToCart(product)}>
-        Add to Cart
-      </button>
     </div>
   );
 };
 
 export default ProductCard;
+
+
+
+// <button onClick={() => onAddToCart(product)}>
+  //        Add to Cart
+   //     </button>

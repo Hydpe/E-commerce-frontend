@@ -18,43 +18,25 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
   const stateData = location.state as { userProfile?: User };
   const userData = stateData?.userProfile || userProfile;
 
-  if (!userData || !userData.cart || userData.cart.products.length === 0) {
+  if (!userData || !userData.cart || userData.cart.products.length === 0)
     return <div>No checkout data available</div>;
-  }
 
   const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        alert("Please login again");
-        return;
-      }
 
       const response = await axios.put(
         "http://localhost:8080/Users/order",
         null,
         {
-          params: {
-            token,
-            address,
-            phone: number,
-          },
+          params: { address, phone: number },
+          withCredentials: true,
         }
       );
 
       const updatedUser: User = response.data;
-
-      // update global state
       setUserProfile(updatedUser);
 
-
-      navigate("/order", {
-        state: {
-          userProfile: updatedUser,
-        },
-      });
-
+      navigate("/order", { state: { userProfile: updatedUser } });
     } catch (error) {
       console.error("Order Failed:", error);
       alert("Order Failed");
@@ -64,12 +46,9 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
       <h1>Checkout</h1>
-
       <h2>Name: {userData.name}</h2>
       <p>Email: {userData.email}</p>
-
       <h3>Products</h3>
-
       {userData.cart.products.map((product) => (
         <div
           key={product.id}
@@ -86,17 +65,11 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
           <img
             src={product.image}
             alt={product.productName}
-            style={{
-              width: "100px",
-              height: "100px",
-              objectFit: "contain",
-              borderRadius: "6px",
-            }}
+            style={{ width: "100px", height: "100px", objectFit: "contain", borderRadius: "6px" }}
           />
           <div>{product.productName}</div>
         </div>
       ))}
-
       <input
         type="text"
         value={address}
@@ -104,7 +77,6 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
         placeholder="Delivery Address"
         style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
       />
-
       <input
         type="text"
         value={number}
@@ -112,10 +84,7 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
         placeholder="Phone Number"
         style={{ width: "100%", padding: "10px" }}
       />
-
-      <button onClick={handleSubmit} style={{ marginTop: "20px" }}>
-        Order Confirm
-      </button>
+      <button onClick={handleSubmit} style={{ marginTop: "20px" }}>Order Confirm</button>
     </div>
   );
 };

@@ -6,49 +6,44 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
-  if (!userProfile) {
-    return <h2 style={{ textAlign: "center" }}>Please login to view profile</h2>;
-  }
+  if (!userProfile)
+    return <h2 style={{ textAlign: "center", marginTop: "30px", color: "#444" }}>Please login to view profile</h2>;
 
   const { id, name, email, phoneNumber, address, cart, orders } = userProfile;
 
   return (
-    <div style={{ maxWidth: "700px", margin: "30px auto" }}>
-      <h1>My Profile</h1>
+    <div style={{ maxWidth: "700px", margin: "30px auto", padding: "20px", border: "1px solid #ddd", borderRadius: "6px", fontFamily: "Arial, sans-serif" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>My Profile</h1>
 
-      {/* BASIC INFO */}
-      <h3>Basic Info</h3>
-      <p>ID: {id}</p>
-      <p>Name: {name}</p>
-      <p>Email: {email}</p>
-      <p>Phone: {phoneNumber || "Not added"}</p>
-      <p>Address: {address || "Not added"}</p>
+      <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: "5px" }}>Basic Info</h3>
+      <p><strong>ID:</strong> {id}</p>
+      <p><strong>Name:</strong> {name}</p>
+      <p><strong>Email:</strong> {email}</p>
+      <p><strong>Phone:</strong> {phoneNumber || "Not added"}</p>
+      <p><strong>Address:</strong> {address || "Not added"}</p>
 
-      {/* CART */}
-      <h3>Cart</h3>
+      <hr style={{ margin: "20px 0" }} />
+
+      <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: "5px" }}>Cart</h3>
       {!cart || cart.products.length === 0 ? (
-        <p>Cart is empty</p>
+        <p style={{ color: "#777" }}>Cart is empty</p>
       ) : (
         cart.products.map((p) => (
-          <p key={p.id}>
-            {p.productName} — Qty: {p.quantity}
-          </p>
+          <p key={p.id} style={{ marginLeft: "15px" }}>• {p.productName} — Qty: {p.quantity}</p>
         ))
       )}
 
-      {/* ORDERS */}
-      <h3>Orders</h3>
+      <hr style={{ margin: "20px 0" }} />
+
+      <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: "5px" }}>Orders</h3>
       {orders.length === 0 ? (
-        <p>No orders yet</p>
+        <p style={{ color: "#777" }}>No orders yet</p>
       ) : (
         orders.map((order) => (
-          <div key={order.id} style={{ marginBottom: "10px" }}>
-            <strong>Order #{order.id}</strong>
-
+          <div key={order.id} style={{ marginBottom: "12px", padding: "10px", border: "1px solid #eee", borderRadius: "4px" }}>
+             <strong>Order {order.id}</strong>
             {order.products.map((p) => (
-              <p key={p.id} style={{ marginLeft: "10px" }}>
-                {p.productName} — Qty: {p.quantity}
-              </p>
+              <p key={p.id} style={{ marginLeft: "15px", marginTop: "5px" }}>• {p.productName} — Qty: {p.quantity}</p>
             ))}
           </div>
         ))

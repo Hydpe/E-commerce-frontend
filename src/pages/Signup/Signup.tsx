@@ -1,11 +1,10 @@
-// src/pages/Signup/Signup.tsx
 import React, { useState } from "react";
 import axios from "axios";
 import "./Signup.css";
- import {User} from "../../Data/Interfaces";
+import { User } from "../../Data/Interfaces";
+
 interface SignupProps {
   setIsLoggedIn: (value: boolean) => void;
-
 }
 
 const Signup: React.FC<SignupProps> = ({ setIsLoggedIn }) => {
@@ -13,64 +12,34 @@ const Signup: React.FC<SignupProps> = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-const handleSignup = async () => {
-  if (!name || !email || !password) {
-    alert("Please fill all fields");
-    return;
-  }
+  const handleSignup = async () => {
+    if (!name || !email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
 
-  try {
-    const response = await axios.post(
-      "http://localhost:8080/Users/signup",
-      {
-        name,
-        email,
-        password,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    try {
 
-    console.log("Signup success:", response.data);
-    //setIsLoggedIn(true);
-   // setUserProfile(response.data);
+      await axios.post(
+        "http://localhost:8080/Users/signup",
+        { name, email, password },
+        { withCredentials: true } //  session cookie
+      );
 
-  } catch (error) {
-    console.error("Signup failed:", error);
-    alert("Signup failed");
-  }
-};
+      alert("Signup successful! Please login.");
+    } catch (error) {
+      console.error("Signup failed:", error);
+      alert("Signup failed");
+    }
+  };
+
   return (
     <div className="signup-container">
       <h2>Create Account</h2>
-
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <button type="button" onClick={handleSignup}>
-        Signup
-      </button>
+      <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <button type="button" onClick={handleSignup}>Signup</button>
     </div>
   );
 };
