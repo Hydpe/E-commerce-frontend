@@ -4,6 +4,7 @@ import axios from "axios";
 
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
+import Home from "./components/Home/Home";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import Products from "./pages/Products/Products";
@@ -22,6 +23,7 @@ axios.defaults.withCredentials = true;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [page,setPage]=useState("");
 
   useEffect(() => {
     //  Check session on page load
@@ -51,8 +53,9 @@ function App() {
 
         <main style={{ flex: 1 }}>
           <Routes>
-            <Route path="/products1" element={<Products />} />
-            <Route path="/products2" element={<Products />} />
+             <Route path="/" element={<Home />}/>
+            <Route path="/products1" element={<Products page = "mobiles"/>} />
+            <Route path="/products2" element={<Products page = "laptops"/>} />
             <Route
               path="/login"
               element={<Login setIsLoggedIn={setIsLoggedIn} setUserProfile={setUserProfile} />}

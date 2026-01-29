@@ -19,20 +19,18 @@ const Signup: React.FC<SignupProps> = ({ setIsLoggedIn }) => {
     }
 
     try {
-
       await axios.post(
         "http://localhost:8080/Users/signup",
         { name, email, password },
-        { withCredentials: true } //  session cookie
+        { withCredentials: true }
       );
-
-      alert("Signup successful! Please login.");
+      setIsLoggedIn(true);
+     // alert("Signup successful! Please login.");
     } catch (error) {
       console.error("Signup failed:", error);
       alert("Signup failed");
     }
   };
-
   return (
     <div className="signup-container">
       <h2>Create Account</h2>

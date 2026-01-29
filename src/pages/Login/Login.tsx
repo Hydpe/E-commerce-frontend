@@ -34,6 +34,7 @@ const Login: React.FC<LoginProps> = ({ setIsLoggedIn, setUserProfile }) => {
       const response2 = await axios.get<User>("http://localhost:8080/Users/getProfile", { withCredentials: true });
       setUserProfile(response2.data);
       setIsLoggedIn(true);
+     //  alert("Login success");
 
       if (location.state?.fromPdp) {
         navigate("/pdp/" + location.state.productId);

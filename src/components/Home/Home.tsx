@@ -5,7 +5,7 @@ const Home: React.FC = () => {
   return (
     <div className="home-container">
       <h1>Welcome to Ecommerce App</h1>
-      <p>Explore amazing products and manage your cart easily!</p>
+      <p>Explore amazing products and manage your cart easily</p>
     </div>
   );
 };

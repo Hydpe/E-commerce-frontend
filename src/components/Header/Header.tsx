@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, setIsLoggedIn, setUserProfi
       <h2> Techouts Ecommerce</h2>
       <nav>
         <Link to="/products1" className="nav-link">Mobiles</Link>
-        <Link to="/products2" className="nav-link">Lpatops</Link>
+        <Link to="/products2" className="nav-link">Laptopes</Link>
         {isLoggedIn && <Link to="/cart" className="nav-link">Cart</Link>}
 
         {isLoggedIn ? (
