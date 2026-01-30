@@ -1,11 +1,14 @@
 import React from "react";
 import { User } from "../../Data/Interfaces";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileProps {
   userProfile: User | null;
 }
 
 const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
+    const navigate = useNavigate();
+
   if (!userProfile)
     return (
       <h2 style={{ textAlign: "center", marginTop: "60px", color: "#666" }}>
@@ -13,7 +16,8 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
       </h2>
     );
 
-  const { id, name, email, phoneNumber, address, cart, orders } = userProfile;
+  // ✅ FIXED: phoneNumber instead of phone, removed unused cart
+  const { id, name, email, phoneNumber, address, orders } = userProfile;
 
   const validOrders = orders.filter(
     (order) => order.products && order.products.length > 0
@@ -28,16 +32,14 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
         background: "linear-gradient(135deg, #f8fafc, #ffffff)",
         borderRadius: "16px",
         boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
-        fontFamily: "Inter, Arial, sans-serif",
       }}
     >
-      {/* HEADER */}
       <h1
         style={{
           textAlign: "center",
           marginBottom: "35px",
           fontSize: "32px",
-          fontWeight: "700",
+          fontWeight: 700,
           color: "#0f172a",
         }}
       >
@@ -60,24 +62,6 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
         <InfoCard label="Address" value={address || "Not added"} />
       </div>
 
-      {/* CART */}
-      <Section title="Cart">
-        {!cart || cart.products.length === 0 ? (
-          <EmptyText text="Your cart is empty" />
-        ) : (
-          <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
-            {cart.products.map((p) => (
-              <Card key={p.id}>
-                <strong>{p.productName}</strong>
-                <div style={{ marginTop: "6px", color: "#475569" }}>
-                  Qty: {p.quantity}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </Section>
-
       {/* ORDERS */}
       <Section title="Orders">
         {validOrders.length === 0 ? (
@@ -92,13 +76,18 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
             return (
               <div
                 key={order.id}
+                onClick={() => navigate(`/orders/${order.id}`, { state: order })}
                 style={{
                   background: "#ffffff",
                   borderRadius: "14px",
                   padding: "18px",
                   marginBottom: "20px",
                   boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                  cursor: "pointer",
+                  transition: "transform 0.2s",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
               >
                 <div
                   style={{
@@ -133,6 +122,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
   );
 };
 
+/* ---------- Reusable Components ---------- */
 
 const Section = ({ title, children }: any) => (
   <div style={{ marginBottom: "40px" }}>
@@ -162,20 +152,6 @@ const InfoCard = ({ label, value }: any) => (
   >
     <div style={{ fontSize: "13px", color: "#64748b" }}>{label}</div>
     <div style={{ fontWeight: 600, marginTop: "4px" }}>{value}</div>
-  </div>
-);
-
-const Card = ({ children }: any) => (
-  <div
-    style={{
-      background: "#ffffff",
-      padding: "14px",
-      borderRadius: "12px",
-      minWidth: "220px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-    }}
-  >
-    {children}
   </div>
 );
 

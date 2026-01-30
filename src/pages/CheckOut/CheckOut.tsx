@@ -13,22 +13,33 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
   const location = useLocation();
 
   const [address, setAddress] = useState("");
-  const [number, setNumber] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+91"); // Default India
 
   const stateData = location.state as { userProfile?: User };
   const userData = stateData?.userProfile || userProfile;
 
   if (!userData || !userData.cart || userData.cart.products.length === 0)
-    return <div>No checkout data available</div>;
+    return <div style={{ textAlign: "center", marginTop: "50px" }}>No checkout data available</div>;
 
   const handleSubmit = async () => {
+    if (!address.trim()) {
+      alert("Please enter delivery address");
+      return;
+    }
+    if (!phone.trim()) {
+      alert("Please enter phone number");
+      return;
+    }
+
     try {
+      const fullPhone = `${countryCode}${phone}`; // combine country code and number
 
       const response = await axios.put(
         "http://localhost:8080/Users/order",
         null,
         {
-          params: { address, phone: number },
+          params: { address, phone: fullPhone },
           withCredentials: true,
         }
       );
@@ -48,6 +59,7 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
       <h1>Checkout</h1>
       <h2>Name: {userData.name}</h2>
       <p>Email: {userData.email}</p>
+
       <h3>Products</h3>
       {userData.cart.products.map((product) => (
         <div
@@ -70,6 +82,8 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
           <div>{product.productName}</div>
         </div>
       ))}
+
+      {/* Address Input */}
       <input
         type="text"
         value={address}
@@ -77,14 +91,44 @@ const CheckOut: React.FC<CheckOutProps> = ({ userProfile, setUserProfile }) => {
         placeholder="Delivery Address"
         style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
       />
-      <input
-        type="text"
-        value={number}
-        onChange={(e) => setNumber(e.target.value)}
-        placeholder="Phone Number"
-        style={{ width: "100%", padding: "10px" }}
-      />
-      <button onClick={handleSubmit} style={{ marginTop: "20px" }}>Order Confirm</button>
+
+      {/* Phone input with country code */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <select
+          value={countryCode}
+          onChange={(e) => setCountryCode(e.target.value)}
+          style={{ padding: "10px", width: "80px" }}
+        >
+          <option value="+91">+91 (India)</option>
+          <option value="+1">+1 (USA)</option>
+          <option value="+44">+44 (UK)</option>
+          {/* Add more country codes if needed */}
+        </select>
+
+        <input
+          type="number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Phone Number"
+          style={{ flex: 1, padding: "10px" }}
+        />
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        style={{
+          width: "100%",
+          padding: "12px",
+          backgroundColor: "#0ea5e9", // Blue color
+          color: "#fff",
+          fontWeight: "bold",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+        }}
+      >
+        Confirm Order
+      </button>
     </div>
   );
 };
