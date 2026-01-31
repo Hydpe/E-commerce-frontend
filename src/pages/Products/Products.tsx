@@ -23,13 +23,16 @@ const ProductsPage: React.FC<ProductsProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
   const [cartIds, setCartIds] = useState<Set<number>>(new Set());
+  const [error, setError] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const navigate = useNavigate();
 
   const fetchProducts = useCallback(() => {
     setLoading(true);
+    setError("");
+
     axios
       .get(`http://localhost:8080/ProductsData/GetCategory/${page}`)
       .then((res) => {
@@ -43,7 +46,11 @@ const ProductsPage: React.FC<ProductsProps> = ({
         setProducts(mapped);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error("Failed to fetch products:", err);
+        setError("Failed to load products. Please try again later.");
+        setLoading(false);
+      });
   }, [page]);
 
   useEffect(() => {
@@ -51,7 +58,10 @@ const ProductsPage: React.FC<ProductsProps> = ({
   }, [fetchProducts]);
 
   const handleAddToCart = async (product: Product) => {
-    if (!userProfile || !userProfile.cart) return;
+    if (!userProfile || !userProfile.cart) {
+      setError("Please login to add items to cart");
+      return;
+    }
 
     const iproduct: Iproduct = {
       id: product.id,
@@ -65,29 +75,54 @@ const ProductsPage: React.FC<ProductsProps> = ({
     };
 
     try {
-      await axios.put(
+      const response = await axios.put(
         `http://localhost:8080/Cart/${product.id}`,
         {},
         { withCredentials: true }
       );
 
+      // Check if response indicates an error
+      if (response.data.error) {
+        setError(response.data.error);
+        return;
+      }
+
       // Add product to user's cart
       userProfile.cart.products.push(iproduct);
 
-
-      setCartIds(prev => {
+      setCartIds((prev) => {
         const newSet = new Set(prev);
         newSet.add(product.id);
         return newSet;
       });
 
-    } catch (err) {
+      setSuccessMessage(`${product.name} added to cart!`);
+      setTimeout(() => setSuccessMessage(""), 3000);
+
+    } catch (err: any) {
       console.error("Add to cart failed:", err);
-      alert("Failed to add product to cart");
+
+      // Handle different error types
+      if (err.response?.status === 401) {
+        setError("Please login to add items to cart");
+      } else if (err.response?.status === 404) {
+        setError("Product not found");
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to add product to cart. Please try again.");
+      }
     }
   };
 
-  if (loading) return <h2>Loading products...</h2>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <h2>Loading products...</h2>
+      </div>
+    );
+  }
 
   // FILTER PRODUCTS BASED ON SEARCH TERM
   const filteredProducts = searchTerm
@@ -97,33 +132,53 @@ const ProductsPage: React.FC<ProductsProps> = ({
     : products;
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>{page === "mobiles" ? "Mobiles 📱" : "Laptops 💻"}</h1>
+    <div className="products-page">
+      {/* Error Message */}
+      {error && (
+        <div className="error-banner">
+          <span>{error}</span>
+          <button onClick={() => setError("")}>×</button>
+        </div>
+      )}
 
-        <button
-          style={{ fontSize: "30px", padding: "0 20px" }}
-          onClick={() => setShowModal(true)}
-        >
-          ➕
+      {/* Success Message */}
+      {successMessage && (
+        <div className="success-banner">
+          <span>{successMessage}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="products-header">
+        <h1>{page === "mobiles" ? "Mobiles " : "Laptops "}</h1>
+        <button className="add-product-btn" onClick={() => setShowModal(true)}>
+           Add Product
         </button>
       </div>
 
-      <div className="products-grid">
-        {filteredProducts.map((product) => (
-          <div key={product.id} style={{ position: "relative" }}>
-            <ProductCard
-              product={product}
-              onAddToCart={handleAddToCart}
-              isLoggedIn={isLoggedIn}
-              page={page}
-              isInCart={cartIds.has(product.id)}
-              onViewCart={() => navigate("/cart")}
-            />
-          </div>
-        ))}
-      </div>
+      {/* Products Grid */}
+      {filteredProducts.length === 0 ? (
+        <div className="no-products">
+          <p>No products found</p>
+        </div>
+      ) : (
+        <div className="products-grid">
+          {filteredProducts.map((product) => (
+            <div key={product.id}>
+              <ProductCard
+                product={product}
+                onAddToCart={handleAddToCart}
+                isLoggedIn={isLoggedIn}
+                page={page}
+                isInCart={cartIds.has(product.id)}
+                onViewCart={() => navigate("/cart")}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
+      {/* Add Product Modal */}
       {showModal && (
         <AddProductModal
           category={page}

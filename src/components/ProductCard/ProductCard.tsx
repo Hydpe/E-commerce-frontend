@@ -7,8 +7,8 @@ interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
   isLoggedIn: boolean;
-  isInCart: boolean;       // NEW
-  onViewCart: () => void;  // NEW
+  isInCart: boolean; // tracks if product is in cart
+  onViewCart: () => void;
   page: string;
 }
 
@@ -27,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       navigate("/login");
       return;
     }
-    onAddToCart(product); // parent handles state change
+    onAddToCart(product);
   };
 
   return (
@@ -35,6 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <img
         src={product.image}
         alt={product.name}
+        className="product-image"
         onClick={() => navigate(`/pdp/${page}/${product.id}`)}
       />
 
@@ -42,15 +43,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <p className="price">₹{product.price}</p>
 
       {isLoggedIn && (
-        isInCart ? (
-          <button className="view-cart-btn" onClick={onViewCart}>
-            View Cart
-          </button>
-        ) : (
-          <button className="add-cart-btn" onClick={handleAddToCart}>
-            Add to Cart
-          </button>
-        )
+        <button
+          className={`add-cart-btn ${isInCart ? "added" : ""}`}
+          onClick={handleAddToCart}
+        >
+          Add to Cart
+        </button>
       )}
     </div>
   );

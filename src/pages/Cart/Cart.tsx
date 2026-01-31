@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { User } from "../../Data/Interfaces";
+import "./Cart.css";
 
 interface CartProps {
   userProfile: User | null;
@@ -10,73 +11,85 @@ interface CartProps {
 
 const Cart: React.FC<CartProps> = ({ userProfile, setUserProfile }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  if (!userProfile || !userProfile.cart || userProfile.cart.products.length === 0) {
+  useEffect(() => {
+    axios
+      .get<User>("http://localhost:8080/Users/getProfile", {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.data) {
+          setUserProfile(res.data);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch profile:", err);
+        setError("Failed to load cart. Please try again.");
+        setUserProfile(null);
+        setLoading(false);
+      });
+  }, [setUserProfile]);
+
+  const handleDelete = async (productId: number) => {
+    setDeletingId(productId);
+    setError("");
+
+    try {
+      const res = await axios.delete(
+        `http://localhost:8080/Cart/${productId}`,
+        { withCredentials: true }
+      );
+
+      setUserProfile((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          cart: res.data,
+        };
+      });
+    } catch (err: any) {
+      console.error("Delete failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to manage your cart");
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Failed to remove item. Please try again.");
+      }
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "60vh",
-          textAlign: "center",
-          background: "linear-gradient(135deg, #e0f2fe, #fef9c3)",
-          borderRadius: "16px",
-          padding: "40px",
-          margin: "40px auto",
-          maxWidth: "500px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2 style={{ fontSize: "28px", fontWeight: 700 }}>
-          Your Cart is Empty
-        </h2>
-        <p style={{ color: "#475569", marginBottom: "20px" }}>
-          Looks like you haven't added anything yet.
-        </p>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            padding: "12px 24px",
-            backgroundColor: "#0ea5e9",
-            color: "#fff",
-            borderRadius: "8px",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
+      <div className="cart-loading">
+        <div className="spinner"></div>
+        <h2>Loading your cart...</h2>
+      </div>
+    );
+  }
+
+  if (
+    !userProfile ||
+    !userProfile.cart ||
+    userProfile.cart.products.length === 0
+  ) {
+    return (
+      <div className="empty-cart">
+        <div className="empty-cart-icon"></div>
+        <h2>Your Cart is Empty</h2>
+        <p>Looks like you haven't added anything yet.</p>
+        <button className="continue-shopping-btn" onClick={() => navigate("/")}>
           Continue Shopping
         </button>
       </div>
     );
   }
-
-const handleDelete = async (productId: number) => {
-  try {
-    const res = await axios.delete(
-      `http://localhost:8080/Cart/${productId}`,
-      { withCredentials: true }
-    );
-
-
-    const updatedCart = res.data;
-
-    setUserProfile((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        cart: updatedCart,
-      };
-    });
-
-  } catch (error) {
-    console.error("Delete failed:", error);
-    alert("Failed to delete product");
-    alert(productId);
-  }
-};
 
   const totalPrice = userProfile.cart.products.reduce(
     (sum, p) => sum + p.price * p.quantity,
@@ -84,80 +97,99 @@ const handleDelete = async (productId: number) => {
   );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <button
-        style={{
-          padding: "12px 20px",
-          backgroundColor: "#38bdf8",
-          color: "#0f172a",
-          fontWeight: 600,
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          marginBottom: "20px",
-        }}
-        onClick={() =>
-          navigate("/checkOut/" + userProfile.id, {
-            state: { userProfile },
-          })
-        }
-      >
-        CheckOut
-      </button>
+    <div className="cart-container">
+      {/* Error Message */}
+      {error && (
+        <div className="error-banner">
+          <span>{error}</span>
+          <button onClick={() => setError("")}>×</button>
+        </div>
+      )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-        {userProfile.cart.products.map((product) => (
-          <div
-            key={product.id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "12px",
-              borderRadius: "8px",
-              width: "200px",
-              textAlign: "center",
-            }}
-          >
-            <img
-              src={product.image}
-              alt={product.productName}
-              style={{
-                width: "100%",
-                height: "150px",
-                objectFit: "contain",
-                marginBottom: "10px",
-              }}
-            />
-            <h3>{product.productName}</h3>
-            <p style={{ fontWeight: "bold" }}>₹{product.price}</p>
-
-            <button
-              onClick={() => handleDelete(product.id)}
-              style={{
-                marginTop: "10px",
-                padding: "8px 12px",
-                backgroundColor: "#ef4444",
-                color: "#fff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: 600,
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+      {/* Header */}
+      <div className="cart-header">
+        <h1>Shopping Cart</h1>
+        <p className="item-count">
+          {userProfile.cart.products.length} {userProfile.cart.products.length === 1 ? 'item' : 'items'}
+        </p>
       </div>
 
-      <div
-        style={{
-          marginTop: "30px",
-          textAlign: "right",
-          fontSize: "18px",
-          fontWeight: "bold",
-        }}
-      >
-        Total Price: ₹{totalPrice}
+      {/* Cart Items */}
+      <div className="cart-content">
+        <div className="cart-items">
+          {userProfile.cart.products.map((product) => (
+            <div key={product.id} className="cart-item">
+              <img
+                src={product.image}
+                alt={product.productName}
+                className="cart-item-image"
+              />
+
+              <div className="cart-item-details">
+                <h3>{product.productName}</h3>
+                <p className="cart-item-price">₹{product.price.toLocaleString()}</p>
+                <p className="cart-item-quantity">Quantity: {product.quantity}</p>
+              </div>
+
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(product.id)}
+                disabled={deletingId === product.id}
+              >
+                {deletingId === product.id ? (
+                  <>
+                    <div className="btn-spinner"></div>
+                    Removing...
+                  </>
+                ) : (
+                  <>
+                     Remove
+                  </>
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Cart Summary */}
+        <div className="cart-summary">
+          <h2>Order Summary</h2>
+
+          <div className="summary-row">
+            <span>Subtotal</span>
+            <span>₹{totalPrice.toLocaleString()}</span>
+          </div>
+
+          <div className="summary-row">
+            <span>Shipping</span>
+            <span>₹40</span>
+          </div>
+
+          <div className="summary-divider"></div>
+
+          <div className="summary-row total">
+            <span>Total</span>
+            <span>₹{(totalPrice + 40).toLocaleString()}</span>
+          </div>
+
+          <button
+            className="checkout-btn"
+            onClick={() =>
+              navigate("/checkOut/" + userProfile.id, {
+                state: { userProfile },
+              })
+            }
+          >
+            Proceed to Checkout
+          </button>
+
+          <button
+            className="continue-btn"
+            onClick={() => navigate("/")}
+          >
+            Continue Shopping
+          </button>
+        </div>
       </div>
     </div>
   );

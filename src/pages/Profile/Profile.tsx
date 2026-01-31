@@ -1,60 +1,32 @@
 import React from "react";
 import { User } from "../../Data/Interfaces";
 import { useNavigate } from "react-router-dom";
+import "./Profile.css";
 
 interface ProfileProps {
   userProfile: User | null;
 }
 
 const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   if (!userProfile)
     return (
-      <h2 style={{ textAlign: "center", marginTop: "60px", color: "#666" }}>
+      <h2 className="empty-text" style={{ textAlign: "center", marginTop: "60px", color: "#666" }}>
         Please login to view your profile
       </h2>
     );
 
-  // ✅ FIXED: phoneNumber instead of phone, removed unused cart
   const { id, name, email, phoneNumber, address, orders } = userProfile;
 
-  const validOrders = orders.filter(
-    (order) => order.products && order.products.length > 0
-  );
+  const validOrders = orders.filter((order) => order.products && order.products.length > 0);
 
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "40px auto",
-        padding: "30px",
-        background: "linear-gradient(135deg, #f8fafc, #ffffff)",
-        borderRadius: "16px",
-        boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "35px",
-          fontSize: "32px",
-          fontWeight: 700,
-          color: "#0f172a",
-        }}
-      >
-        My Profile
-      </h1>
+    <div className="profile-container">
+      <h1>My Profile</h1>
 
       {/* BASIC INFO */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "20px",
-          marginBottom: "40px",
-        }}
-      >
+      <div className="info-grid">
         <InfoCard label="User ID" value={id} />
         <InfoCard label="Name" value={name} />
         <InfoCard label="Email" value={email} />
@@ -68,48 +40,21 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
           <EmptyText text="No completed orders yet" />
         ) : (
           validOrders.map((order) => {
-            const total = order.products.reduce(
-              (sum, p) => sum + p.price * p.quantity,
-              0
-            );
+            const total = order.products.reduce((sum, p) => sum + p.price * p.quantity, 0);
 
             return (
               <div
                 key={order.id}
+                className="order-card"
                 onClick={() => navigate(`/orders/${order.id}`, { state: order })}
-                style={{
-                  background: "#ffffff",
-                  borderRadius: "14px",
-                  padding: "18px",
-                  marginBottom: "20px",
-                  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-                  cursor: "pointer",
-                  transition: "transform 0.2s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "10px",
-                    fontWeight: 600,
-                  }}
-                >
+                <div className="order-card-header">
                   <span>Order #{order.id}</span>
                   <span>₹{total}</span>
                 </div>
 
                 {order.products.map((p) => (
-                  <div
-                    key={p.id}
-                    style={{
-                      padding: "6px 0",
-                      color: "#475569",
-                      borderBottom: "1px dashed #e5e7eb",
-                    }}
-                  >
+                  <div key={p.id} className="order-product">
                     {p.productName} × {p.quantity}
                   </div>
                 ))}
@@ -122,41 +67,21 @@ const Profile: React.FC<ProfileProps> = ({ userProfile }) => {
   );
 };
 
-/* ---------- Reusable Components ---------- */
 
 const Section = ({ title, children }: any) => (
-  <div style={{ marginBottom: "40px" }}>
-    <h2
-      style={{
-        marginBottom: "15px",
-        fontSize: "22px",
-        color: "#0f172a",
-        borderLeft: "4px solid #38bdf8",
-        paddingLeft: "10px",
-      }}
-    >
-      {title}
-    </h2>
+  <div className="section">
+    <h2>{title}</h2>
     {children}
   </div>
 );
 
 const InfoCard = ({ label, value }: any) => (
-  <div
-    style={{
-      background: "#ffffff",
-      padding: "14px 16px",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-    }}
-  >
-    <div style={{ fontSize: "13px", color: "#64748b" }}>{label}</div>
-    <div style={{ fontWeight: 600, marginTop: "4px" }}>{value}</div>
+  <div className="info-card">
+    <div className="label">{label}</div>
+    <div className="value">{value}</div>
   </div>
 );
 
-const EmptyText = ({ text }: any) => (
-  <p style={{ color: "#64748b", marginTop: "10px" }}>{text}</p>
-);
+const EmptyText = ({ text }: any) => <p className="empty-text">{text}</p>;
 
 export default Profile;

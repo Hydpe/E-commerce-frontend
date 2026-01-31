@@ -1,60 +1,232 @@
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  padding: 15px;
 }
 
+/* Modal Box */
 .modal-box {
-  background: white;
-  padding: 20px;
-  width: 500px;
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Error Banner */
+.modal-error-banner {
+  background: #ffe5e5;
+  color: #cc0000;
+  padding: 10px 15px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  margin: 15px 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Products Forms */
+.products-forms {
+  padding: 15px 20px;
+  overflow-y: auto;
 }
 
 .product-form {
+  background: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 15px;
   margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
 
-.product-form input,
-.product-form textarea {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.remove-btn {
-  background: red;
-  color: white;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-  width: fit-content;
-  margin-top: 5px;
-}
-
-.modal-actions {
+.form-header {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.remove-form-btn {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.remove-form-btn:hover {
+  background: #c53030;
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-input, .form-textarea {
+  padding: 10px;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+/* Modal Actions */
+.modal-actions {
+  padding: 15px 20px;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-another-btn {
+  padding: 10px;
+  background: #fff;
+  border: 1.5px dashed #4a90e2;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #4a90e2;
+  font-weight: 500;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.add-another-btn:hover {
+  background: #f0f8ff;
+  border-color: #357abd;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.save-btn, .cancel-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.save-btn {
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #357abd;
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .cancel-btn {
-  background: gray;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
+  background: #fff;
+  border: 1.5px solid #ccc;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Spinner */
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-right: 5px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .action-buttons {
+    flex-direction: column;
+  }
 }

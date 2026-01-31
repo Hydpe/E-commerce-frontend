@@ -1,81 +1,66 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import "./OrderDetails.css";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
   const { state: order }: any = useLocation();
 
-  if (!order)
-    return <h2 style={{ textAlign: "center" }}>Order not found</h2>;
+  if (!order) {
+    return (
+      <div className="order-details-error">
+        <h2> Order Not Found</h2>
+        <p>The order information you're looking for is not available.</p>
+        <button onClick={() => navigate("/profile")}>Back to Profile</button>
+      </div>
+    );
+  }
+
+  const orderTotal = order.products.reduce(
+    (sum: number, p: any) => sum + p.price * p.quantity,
+    0
+  );
 
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "40px auto",
-        padding: "30px",
-      }}
-    >
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "20px",
-          background: "#2563eb",
-          color: "#fff",
-          padding: "8px 14px",
-          borderRadius: "8px",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        ← Back to Profile
-      </button>
+    <div className="order-details-container">
+      {/* Header */}
+      <div className="order-details-header">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          ← Back to Profile
+        </button>
+        <h1>Order Details</h1>
+      </div>
 
-      <h1 style={{ marginBottom: "25px" }}>
-        Order #{order.id}
-      </h1>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {order.products.map((p: any) => (
-          <div
-            key={p.id}
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              padding: "14px",
-              boxShadow: "0 6px 15px rgba(0,0,0,0.08)",
-            }}
-          >
-            <img
-              src={p.image}
-              alt={p.productName}
-              style={{
-                width: "100%",
-                height: "140px",
-                objectFit: "contain",
-                marginBottom: "10px",
-              }}
-            />
-
-            <h4 style={{ marginBottom: "6px" }}>
-              {p.productName}
-            </h4>
-
-            <p style={{ color: "#64748b", fontSize: "14px" }}>
-              Quantity: {p.quantity}
-            </p>
-
-            <p style={{ fontWeight: 600 }}>
-              ₹{p.price}
-            </p>
+      {/* Order Info */}
+      <div className="order-info-card">
+        <div className="order-id-badge">Order #{order.id}</div>
+        <div className="order-meta">
+          <div className="meta-item">
+            <span className="meta-label">Total Items</span>
+            <span className="meta-value">{order.products.length}</span>
           </div>
-        ))}
+          <div className="meta-item">
+            <span className="meta-label">Order Total</span>
+            <span className="meta-value order-total">₹{orderTotal.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Products Grid */}
+      <div className="products-section">
+        <h2>Products in this Order</h2>
+        <div className="order-products-grid">
+          {order.products.map((p: any) => (
+            <div key={p.id} className="order-product-card">
+              <img src={p.image} alt={p.productName} />
+              <div className="product-info">
+                <h4>{p.productName}</h4>
+                <p className="quantity">Quantity: {p.quantity}</p>
+                <p className="price">₹{p.price.toLocaleString()}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
